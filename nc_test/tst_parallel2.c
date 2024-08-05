@@ -20,7 +20,8 @@ See \ref copyright file for more info.
 #include <nc_tests.h>
 #include "err_macros.h"
 #include <mpi.h>
-#include <pnetcdf.h>
+/*#include <pnetcdf.h>*/
+#define USE_MPE 1
 
 #ifdef USE_MPE
 #include <mpe.h>
