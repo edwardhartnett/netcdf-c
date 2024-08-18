@@ -128,12 +128,12 @@ check_PROGRAMS += tst_mpi_parallel tst_parallel tst_parallel3		\
 tst_parallel4 tst_parallel5 tst_nc4perf tst_mode tst_simplerw_coll_r	\
 tst_mode tst_parallel_zlib tst_parallel_compress			\
 tst_parallel_compress2 tst_quantize_par tst_parallel6
-TESTS += run_par_test.sh
+TESTS += run_par_test.sh run_par_filter_test.sh
 endif # TEST_PARALLEL4
 
-EXTRA_DIST = run_par_test.sh.in ref_tst_compounds.nc			\
-ref_tst_xplatform2_1.nc ref_tst_xplatform2_2.nc ref_tst_dims.nc		\
-ref_tst_interops4.nc CMakeLists.txt run_grp_rename.sh			\
+EXTRA_DIST = run_par_test.sh.in run_par_filter_test.sh.in		\
+ref_tst_compounds.nc ref_tst_xplatform2_1.nc ref_tst_xplatform2_2.nc	\
+ref_tst_dims.nc ref_tst_interops4.nc CMakeLists.txt run_grp_rename.sh	\
 run_empty_vlen_test.sh ref_hdf5_compat1.nc ref_hdf5_compat2.nc		\
 ref_hdf5_compat3.nc tst_misc.sh tdset.h5 tst_szip.sh ref_szip.h5	\
 ref_szip.cdl tst_filter.sh bzip2.cdl noop.cdl ref_filtered.cdl		\
@@ -160,7 +160,7 @@ testfilter_order.nc crfilterorder.txt rdfilterorder.txt 1               \
 tmp_*.txt tmp_*.nc tmp*.dump tmp*.cdl tmp*.txt tmp*.tmp                 \
 tmp_bzip2.c bzip2.nc noop.nc tmp_*.dmp tmp_*.cdl
 
-DISTCLEANFILES = findplugin.sh run_par_test.sh
+DISTCLEANFILES = findplugin.sh run_par_test.sh run_par_filter_test.sh
 
 clean-local:
 	rm -fr testdir_* testset_*

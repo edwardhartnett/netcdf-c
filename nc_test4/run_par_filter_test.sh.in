@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# This .in file is processed at build time into a shell that runs some
+# parallel I/O tests for netCDF/HDF5 parallel I/O. THese tests check
+# parallel filters.
+
+# Ed Hartnett, 8/18/24
+
+set -e
+
+if test "x$srcdir" = x ; then srcdir=`pwd`; fi
+. ../test_common.sh
+
+# Load the findplugins function
+. ${builddir}/findplugin.sh
+echo "findplugin.sh loaded"
+echo "${HDF5_PLUGIN_DIR}"
+
+# Find zstd plugin.
+findplugin h5zstd
+export HDF5_PLUGIN_PATH="${HDF5_PLUGIN_DIR}"
+echo "HDF5_PLUGIN_PATH=$HDF5_PLUGIN_PATH"
+
+# Run the tests.
+echo
+echo "Testing MPI parallel I/O with filters on one processor..."
+@MPIEXEC@ -n 1 ./tst_parallel_compress2
+echo "OK!"
+
+echo "Testing MPI parallel I/O with filters on 4 processors..."
+@MPIEXEC@ -n 4 ./tst_parallel_compress2
+echo "OK!"
+
+echo "SUCCESS!!"
+
