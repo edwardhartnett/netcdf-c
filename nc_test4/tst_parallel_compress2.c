@@ -99,7 +99,7 @@ main(int argc, char **argv)
 			       filter_name[f], s, file_name);
 		    }
 
-		    /* nc_set_log_level(3); */
+		    nc_set_log_level(3);
 		    /* Create a parallel netcdf-4 file. */
 		    if (nc_create_par(file_name, NC_NETCDF4, comm, info, &ncid)) ERR;
 
