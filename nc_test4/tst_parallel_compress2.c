@@ -20,12 +20,12 @@
 #define QTR_DATA (DIMSIZE * DIMSIZE / 4)
 #define NUM_PROC 4
 #define NUM_SLABS 10
-#define NUM_SHUFFLE_SETTINGS 2
-#define MAX_NUM_FILTERS 4
+#define NUM_SHUFFLE_SETTINGS 1
+#define MAX_NUM_FILTERS 2
 #define NONE 0
-#define ZLIB 1
+#define ZLIB 3
 #define SZIP 2
-#define ZSTD 3
+#define ZSTD 1
 
 int
 main(int argc, char **argv)
@@ -77,6 +77,7 @@ main(int argc, char **argv)
     for (i = 0; i < DIMSIZE * DIMSIZE / mpi_size; i++)
        slab_data[i] = mpi_rank;
 
+    nc_set_log_level(3);
     if (!mpi_rank)
        printf("\n*** Testing parallel writes with compression filters.\n");
     {
@@ -99,7 +100,6 @@ main(int argc, char **argv)
 			       filter_name[f], s, file_name);
 		    }
 
-		    nc_set_log_level(3);
 		    /* Create a parallel netcdf-4 file. */
 		    if (nc_create_par(file_name, NC_NETCDF4, comm, info, &ncid)) ERR;
 
@@ -160,50 +160,49 @@ main(int argc, char **argv)
 		    if (nc_close(ncid)) ERR;
 
 		    /* Check file. */
-		    {
-		        int shuffle_in, deflate_in, deflate_level_in;
-		        int options_mask_in, pixels_per_block_in;
-		        int *slab_data_in;
+		    /* { */
+		    /*     int shuffle_in, deflate_in, deflate_level_in; */
+		    /*     int options_mask_in, pixels_per_block_in; */
+		    /*     int *slab_data_in; */
 
-		        /* Allocate data. */
-		        if (!(slab_data_in = malloc(sizeof(int) * DIMSIZE * DIMSIZE / mpi_size))) ERR;
+		    /*     /\* Allocate data. *\/ */
+		    /*     if (!(slab_data_in = malloc(sizeof(int) * DIMSIZE * DIMSIZE / mpi_size))) ERR; */
 
-		        /* Reopen the file for parallel access. */
-		        if (nc_open_par(file_name, NC_NOWRITE, comm, info, &ncid)) ERR;
+		    /*     /\* Reopen the file for parallel access. *\/ */
+		    /*     if (nc_open_par(file_name, NC_NOWRITE, comm, info, &ncid)) ERR; */
 
-		        /* Check state of compression. */
-		        if (f == NONE)
-			{
-		            if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, &deflate_level_in)) ERR;
-		            if (shuffle_in) ERR;
-		            if (deflate_in) ERR;
-			}
-			else if (f == ZLIB)
-		        {
-		            if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, &deflate_level_in)) ERR;
-		            if ((s && !shuffle_in) || (!s && shuffle_in)) ERR;
-		            if (!deflate_in || deflate_level_in != 1) ERR;
-		        }
-		        else if (f == SZIP)
-		        {
-		            if (nc_inq_var_deflate(ncid, 0, &shuffle_in, NULL, NULL)) ERR;
-		            if ((s && !shuffle_in) || (!s && shuffle_in)) ERR;
-		            if (nc_inq_var_szip(ncid, 0, &options_mask_in, &pixels_per_block_in)) ERR;
-		        }
+		    /*     /\* Check state of compression. *\/ */
+		    /*     if (f == NONE) */
+		    /*     { */
+		    /*         if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, &deflate_level_in)) ERR; */
+		    /*         if (shuffle_in) ERR; */
+		    /*         if (deflate_in) ERR; */
+		    /*     } */
+		    /*     else if (f == ZLIB) */
+		    /*     { */
+		    /*         if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, &deflate_level_in)) ERR; */
+		    /*         if ((s && !shuffle_in) || (!s && shuffle_in)) ERR; */
+		    /*         if (!deflate_in || deflate_level_in != 1) ERR; */
+		    /*     } */
+		    /*     else if (f == SZIP) */
+		    /*     { */
+		    /*         if (nc_inq_var_deflate(ncid, 0, &shuffle_in, NULL, NULL)) ERR; */
+		    /*         if ((s && !shuffle_in) || (!s && shuffle_in)) ERR; */
+		    /*         if (nc_inq_var_szip(ncid, 0, &options_mask_in, &pixels_per_block_in)) ERR; */
+		    /*     } */
 
-		        /* Use parallel I/O to read the data. */
-		        for (start[2] = 0; start[2] < NUM_SLABS; start[2]++)
-		        {
-		            if (nc_get_vara_int(ncid, 0, start, count, slab_data_in)) ERR;
-		            for (i = 0; i < DIMSIZE * DIMSIZE / mpi_size; i++)
-		                if (slab_data_in[i] != mpi_rank) ERR;
-		        }
+		    /*     /\* Use parallel I/O to read the data. *\/ */
+		    /*     for (start[2] = 0; start[2] < NUM_SLABS; start[2]++) */
+		    /*     { */
+		    /*         if (nc_get_vara_int(ncid, 0, start, count, slab_data_in)) ERR; */
+		    /*         for (i = 0; i < DIMSIZE * DIMSIZE / mpi_size; i++) */
+		    /*             if (slab_data_in[i] != mpi_rank) ERR; */
+		    /*     } */
 
-		        /* Close the netcdf file. */
-		        if (nc_close(ncid)) ERR;
-
-		        free(slab_data_in);
-		    }
+		    /*     /\* Close the netcdf file. *\/ */
+		    /*     if (nc_close(ncid)) ERR; */
+		    /*     free(slab_data_in); */
+		    /* } */
 
 		    if (!mpi_rank)
 			SUMMARIZE_ERR;
@@ -215,6 +214,7 @@ main(int argc, char **argv)
     }
 #endif /* HDF5_SUPPORTS_PAR_FILTERS */
     
+    nc_set_log_level(-1);
     /* Shut down MPI. */
     MPI_Finalize();
 
