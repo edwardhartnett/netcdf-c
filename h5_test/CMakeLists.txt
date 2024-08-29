@@ -29,12 +29,16 @@ ENDIF()
 if(NETCDF_ENABLE_PLUGINS)
   if(NETCDF_ENABLE_FILTER_ZSTD)
     build_bin_test(tst_h_zstd)
-    add_sh_test(h5_test run_h5_zstd_tests)    
+    add_sh_test(h5_test run_h5_zstd_tests)
+    IF(TEST_PARALLEL4)
+      build_bin_test(tst_h_par_zstd)
+      add_sh_test(h5_test run_par_zstd_tests)
+    endif()
   endif()
 endif()
 
 # Copy the shell file to build directory.
-file(COPY run_h5_zstd_tests.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ FILE_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE)
+file(COPY *.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ FILE_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE)
 
 
 

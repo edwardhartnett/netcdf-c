@@ -958,6 +958,11 @@ if(NETCDF_ENABLE_PARALLEL4 AND NETCDF_ENABLE_HDF5)
     file(COPY "${netCDF_BINARY_DIR}/tmp/run_par_tests.sh"
       DESTINATION ${netCDF_BINARY_DIR}/h5_test
       FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+    configure_file("${netCDF_SOURCE_DIR}/h5_test/run_par_zstd_tests.sh.in"
+      "${netCDF_BINARY_DIR}/tmp/run_par_tests.sh" @ONLY NEWLINE_STYLE LF)
+    file(COPY "${netCDF_BINARY_DIR}/tmp/run_par_zstd_tests.sh"
+      DESTINATION ${netCDF_BINARY_DIR}/h5_test
+      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
     set(IMPORT_MPI "include(CMakeFindDependencyMacro)\nfind_dependency(MPI COMPONENTS C)")
   endif()
 endif()
