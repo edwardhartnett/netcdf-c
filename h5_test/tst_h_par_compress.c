@@ -25,12 +25,11 @@
 /* The following code, when uncommented, adds szip testing for
  * parallel I/O. However, this currently fails. I have a support
  * request in to HDF5 about this. Ed 7/8/20 */
-/* #ifdef HAVE_H5Z_SZIP */
-/* #define NUM_COMPRESS_FILTERS 2 */
-/* #else */
-/* #define NUM_COMPRESS_FILTERS 1 */
-/* #endif /\* HAVE_H5Z_SZIP *\/ */
+#ifdef HAVE_H5Z_SZIP
+#define NUM_COMPRESS_FILTERS 2
+#else
 #define NUM_COMPRESS_FILTERS 1
+#endif /* HAVE_H5Z_SZIP */
 
 int
 main(int argc, char **argv)
