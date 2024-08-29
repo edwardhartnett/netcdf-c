@@ -21,16 +21,16 @@
 #define MILLION 1000000
 #define DIM2_LEN 16000000
 #define SC1 100000 /* slice count. */
+#define H5Z_FILTER_ZSTD 32015
 
 /* The following code, when uncommented, adds szip testing for
  * parallel I/O. However, this currently fails. I have a support
  * request in to HDF5 about this. Ed 7/8/20 */
-/* #ifdef HAVE_H5Z_SZIP */
-/* #define NUM_COMPRESS_FILTERS 2 */
-/* #else */
-/* #define NUM_COMPRESS_FILTERS 1 */
-/* #endif /\* HAVE_H5Z_SZIP *\/ */
+#ifdef NC_HAS_ZSTD
+#define NUM_COMPRESS_FILTERS 2
+#else
 #define NUM_COMPRESS_FILTERS 1
+#endif 
 
 int
 main(int argc, char **argv)
@@ -56,6 +56,7 @@ main(int argc, char **argv)
 	    int data[SC1], data_in[SC1];
 	    int num_steps;
 	    int deflate_level = 4;
+	    unsigned int ulevel = 1;	    
 	    int i, s;
 
 	    /* We will write the same slice of random data over and over to
@@ -93,9 +94,10 @@ main(int argc, char **argv)
 	    }
 	    else
 	    {
-		int options_mask = 32;
-		int bits_per_pixel = 32;
-		if (H5Pset_szip(plistid, options_mask, bits_per_pixel)) ERR;
+		unsigned int id = H5Z_FILTER_ZSTD;
+		herr_t code;		
+		if ((code = H5Pset_filter(plistid, id, H5Z_FLAG_OPTIONAL, 1, &ulevel)))
+		    ERR;
 	    }
 
 	    /* Set chunking. */
